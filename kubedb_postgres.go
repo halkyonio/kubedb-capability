@@ -9,6 +9,7 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	ofst "kmodules.xyz/offshoot-api/api/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
@@ -21,10 +22,19 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func newPostgres(owner framework.Resource) postgres {
+func (res *postgres) SetOwner(owner framework.Resource) {
 	resource := framework.NewDependentResource(&kubedbv1.Postgres{}, owner)
-	p := postgres{DependentResourceHelper: resource}
-	resource.SetDelegate(p)
+	res.DependentResourceHelper = resource
+	resource.SetDelegate(res)
+}
+
+func (res postgres) GetGroupVersionKind() schema.GroupVersionKind {
+	return kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
+}
+
+func newPostgres(owner framework.Resource) *postgres {
+	p := &postgres{}
+	p.SetOwner(owner)
 	return p
 }
 
