@@ -1,17 +1,35 @@
 package main
 
 import (
-	"github.com/natefinch/pie"
+	"github.com/hashicorp/go-plugin"
 	halkyon "halkyon.io/api/capability/v1beta1"
 	plugins "halkyon.io/plugins/capability"
-	"log"
-	"net/rpc/jsonrpc"
 )
 
+const pluginName = "postgresql-capability"
+
+type PostgresPluginResource struct {
+	*postgres
+	ct halkyon.CapabilityType
+	cc halkyon.CapabilityCategory
+}
+
+func (p *PostgresPluginResource) GetSupportedCategory() halkyon.CapabilityCategory {
+	return p.cc
+}
+
+func (p *PostgresPluginResource) GetSupportedType() halkyon.CapabilityType {
+	return p.ct
+}
+
 func main() {
-	p := pie.NewProvider()
-	if err := p.RegisterName("postgresql-capability", plugins.NewPluginServer(halkyon.DatabaseCategory, halkyon.PostgresType, newPostgres(nil))); err != nil {
-		log.Fatalf("failed to register Plugin: %s", err)
+	p := &PostgresPluginResource{
+		postgres: newPostgres(nil),
+		ct:       halkyon.PostgresType,
+		cc:       halkyon.DatabaseCategory,
 	}
-	p.ServeCodec(jsonrpc.NewServerCodec)
+	plugin.Serve(&plugin.ServeConfig{
+		HandshakeConfig: plugins.Handshake,
+		Plugins:         map[string]plugin.Plugin{pluginName: &plugins.GoPluginPlugin{Delegate: p}},
+	})
 }
