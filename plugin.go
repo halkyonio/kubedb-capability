@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"github.com/hashicorp/go-plugin"
 	halkyon "halkyon.io/api/capability/v1beta1"
 	plugins "halkyon.io/plugins/capability"
@@ -18,8 +19,11 @@ type PostgresPluginResource struct {
 	cc halkyon.CapabilityCategory
 }
 
-func (p *PostgresPluginResource) Init(scheme *runtime.Scheme) {
-	kubedbv1.AddToScheme(scheme)
+func (p *PostgresPluginResource) Init() plugins.InitResponse {
+	return plugins.InitResponse{
+		TypesToRegister: []runtime.Object{&kubedbv1.Postgres{}, &kubedbv1.PostgresList{}},
+		GroupVersion:    kubedbv1.SchemeGroupVersion,
+	}
 }
 
 func (p *PostgresPluginResource) GetSupportedCategory() halkyon.CapabilityCategory {
@@ -31,6 +35,8 @@ func (p *PostgresPluginResource) GetSupportedType() halkyon.CapabilityType {
 }
 
 func main() {
+	gob.Register(kubedbv1.Postgres{})
+	gob.Register(kubedbv1.PostgresList{})
 	pluginName := filepath.Base(os.Args[0])
 	p := &PostgresPluginResource{
 		postgres: newPostgres(nil),
