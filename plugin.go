@@ -39,7 +39,7 @@ func main() {
 	gob.Register(kubedbv1.PostgresList{})
 	pluginName := filepath.Base(os.Args[0])
 	p := &PostgresPluginResource{
-		postgres: newPostgres(nil),
+		postgres: newPostgres(),
 		ct:       halkyon.PostgresType,
 		cc:       halkyon.DatabaseCategory,
 	}

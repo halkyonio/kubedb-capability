@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/appscode/go/encoding/json/types"
 	capability "halkyon.io/api/capability/v1beta1"
+	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
+	"halkyon.io/operator-framework/util"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,31 +17,53 @@ import (
 )
 
 type postgres struct {
-	*framework.DependentResourceHelper
+	owner *capability.Capability
 }
+
+func (res postgres) Fetch(helper *framework.K8SHelper) (runtime.Object, error) {
+	return helper.Fetch(res.Name(), res.Owner().GetNamespace(), &kubedbv1.Postgres{})
+}
+
+func (res postgres) Owner() v1beta1.HalkyonResource {
+	return res.owner
+}
+
+func (res postgres) GetTypeName() string {
+	return util.GetObjectName(&kubedbv1.Postgres{})
+}
+
+func (res postgres) ShouldWatch() bool {
+	return true
+}
+
+func (res postgres) CanBeCreatedOrUpdated() bool {
+	return true
+}
+
+func (res postgres) CreateOrUpdate(helper *framework.K8SHelper) error {
+	return framework.CreateOrUpdate(res, helper)
+}
+
+func (res postgres) ShouldBeOwned() bool {
+	return true
+}
+
+var _ framework.DependentResource = &postgres{}
 
 func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func (res *postgres) SetOwner(owner framework.Resource) {
-	resource := framework.NewDependentResource(&kubedbv1.Postgres{}, owner)
-	res.DependentResourceHelper = resource
-	resource.SetDelegate(res)
+func (res *postgres) SetOwner(owner v1beta1.HalkyonResource) {
+	res.owner = owner.(*capability.Capability)
 }
 
 func (res postgres) GetGroupVersionKind() schema.GroupVersionKind {
 	return kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
 }
 
-func newPostgres(owner framework.Resource) *postgres {
-	p := &postgres{}
-	p.SetOwner(owner)
-	return p
-}
-
-func (res postgres) ownerAsCapability() *capability.Capability {
-	return ownerAsCapability(res)
+func newPostgres() *postgres {
+	return &postgres{}
 }
 
 func (res postgres) Name() string {
@@ -48,7 +72,7 @@ func (res postgres) Name() string {
 
 //buildSecret returns the postgres resource
 func (res postgres) Build() (runtime.Object, error) {
-	c := res.ownerAsCapability()
+	c := res.owner
 	ls := getAppLabels(c.Name)
 	paramsMap := parametersAsMap(c.Spec.Parameters)
 
@@ -78,7 +102,7 @@ func (res postgres) Build() (runtime.Object, error) {
 			},
 		},
 	}
-	return postgres, nil
+	return framework.CreateUnstructuredObject(postgres, res.GetGroupVersionKind())
 }
 
 func (postgres) ShouldBeCheckedForReadiness() bool {
