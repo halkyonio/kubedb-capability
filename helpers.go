@@ -8,7 +8,7 @@ import (
 )
 
 func ownerAsCapability(res framework.DependentResource) *v1beta12.Capability {
-	return res.Owner().GetAPIObject().(*v1beta12.Capability)
+	return res.Owner().(*v1beta12.Capability)
 }
 
 // Convert Array of parameters to a Map

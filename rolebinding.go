@@ -14,7 +14,11 @@ func newRoleBinding(owner framework.Resource) roleBinding {
 	generic := framework.NewOwnedRoleBinding(owner,
 		func() string { return "use-scc-privileged" },
 		func() string { return newRole(owner).Name() },
-		func() string { return newPostgres(owner).Name() })
+		func() string {
+			p := newPostgres()
+			p.SetOwner(owner)
+			return p.Name()
+		})
 	rb := roleBinding{RoleBinding: generic}
 	generic.SetDelegate(rb)
 	return rb
