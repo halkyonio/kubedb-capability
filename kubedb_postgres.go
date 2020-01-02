@@ -3,49 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/appscode/go/encoding/json/types"
-	capability "halkyon.io/api/capability/v1beta1"
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
-	"halkyon.io/operator-framework/util"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	ofst "kmodules.xyz/offshoot-api/api/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
 type postgres struct {
-	owner *capability.Capability
+	*framework.BaseDependentResource
 }
 
 func (res postgres) Fetch(helper *framework.K8SHelper) (runtime.Object, error) {
 	return helper.Fetch(res.Name(), res.Owner().GetNamespace(), &kubedbv1.Postgres{})
-}
-
-func (res postgres) Owner() v1beta1.HalkyonResource {
-	return res.owner
-}
-
-func (res postgres) GetTypeName() string {
-	return util.GetObjectName(&kubedbv1.Postgres{})
-}
-
-func (res postgres) ShouldWatch() bool {
-	return true
-}
-
-func (res postgres) CanBeCreatedOrUpdated() bool {
-	return true
-}
-
-func (res postgres) CreateOrUpdate(helper *framework.K8SHelper) error {
-	return framework.CreateOrUpdate(res, helper)
-}
-
-func (res postgres) ShouldBeOwned() bool {
-	return true
 }
 
 var _ framework.DependentResource = &postgres{}
@@ -54,16 +27,12 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func (res *postgres) SetOwner(owner v1beta1.HalkyonResource) {
-	res.owner = owner.(*capability.Capability)
-}
-
-func (res postgres) GetGroupVersionKind() schema.GroupVersionKind {
-	return kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
-}
-
-func newPostgres() *postgres {
-	return &postgres{}
+func newPostgres(owner v1beta1.HalkyonResource) *postgres {
+	config := framework.NewConfig(postgresGVK, owner.GetNamespace())
+	config.CheckedForReadiness = true
+	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
+	p := &postgres{framework.NewConfiguredBaseDependentResource(owner, config)}
+	return p
 }
 
 func (res postgres) Name() string {
@@ -71,18 +40,18 @@ func (res postgres) Name() string {
 }
 
 //buildSecret returns the postgres resource
-func (res postgres) Build() (runtime.Object, error) {
-	c := res.owner
-	ls := getAppLabels(c.Name)
-	paramsMap := parametersAsMap(c.Spec.Parameters)
-
-	postgres := &kubedbv1.Postgres{
-		ObjectMeta: metav1.ObjectMeta{
+func (res postgres) Build(empty bool) (runtime.Object, error) {
+	postgres := &kubedbv1.Postgres{}
+	if !empty {
+		c := ownerAsCapability(res)
+		ls := getAppLabels(c.Name)
+		paramsMap := parametersAsMap(c.Spec.Parameters)
+		postgres.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
 			Labels:    ls,
-		},
-		Spec: kubedbv1.PostgresSpec{
+		}
+		postgres.Spec = kubedbv1.PostgresSpec{
 			Version:  SetDefaultDatabaseVersionIfEmpty(c.Spec.Version),
 			Replicas: replicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
@@ -100,18 +69,9 @@ func (res postgres) Build() (runtime.Object, error) {
 					},
 				},
 			},
-		},
+		}
 	}
-	return framework.CreateUnstructuredObject(postgres, res.GetGroupVersionKind())
-}
-
-func (postgres) ShouldBeCheckedForReadiness() bool {
-	return true
-}
-
-func (res postgres) OwnerStatusField() string {
-	//return res.ownerAsCapability().DependentStatusFieldName()
-	return "PodName" // todo: find a way to compute this as above instead of hardcoding it
+	return framework.CreateUnstructuredObject(postgres, postgresGVK)
 }
 
 func (res postgres) IsReady(underlying runtime.Object) (ready bool, message string) {
