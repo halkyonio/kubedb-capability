@@ -1,7 +1,7 @@
 package main
 
 import (
-	capability "halkyon.io/api/capability/v1beta1"
+	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -9,36 +9,46 @@ import (
 )
 
 type secret struct {
-	*framework.DependentResourceHelper
+	*framework.BaseDependentResource
 }
+
+func (res secret) NameFrom(underlying runtime.Object) string {
+	return framework.DefaultNameFrom(res, underlying)
+}
+
+func (res secret) Fetch(helper *framework.K8SHelper) (runtime.Object, error) {
+	return framework.DefaultFetcher(res, helper)
+}
+
+func (res secret) IsReady(underlying runtime.Object) (ready bool, message string) {
+	return framework.DefaultIsReady(underlying)
+}
+
+var _ framework.DependentResource = &secret{}
 
 func (res secret) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func newSecret(owner framework.Resource) secret {
-	resource := framework.NewDependentResource(&v1.Secret{}, owner)
-	s := secret{DependentResourceHelper: resource}
-	resource.SetDelegate(s)
-	return s
-}
-
-func (res secret) ownerAsCapability() *capability.Capability {
-	return ownerAsCapability(res)
+func newSecret(owner v1beta1.HalkyonResource) secret {
+	config := framework.NewConfig(secretGVK, owner.GetNamespace())
+	config.Watched = false
+	return secret{framework.NewConfiguredBaseDependentResource(owner, config)}
 }
 
 //buildSecret returns the secret resource
-func (res secret) Build() (runtime.Object, error) {
-	c := res.ownerAsCapability()
-	ls := getAppLabels(c.Name)
-	paramsMap := parametersAsMap(c.Spec.Parameters)
-	secret := &v1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
+func (res secret) Build(empty bool) (runtime.Object, error) {
+	secret := &v1.Secret{}
+	if !empty {
+		c := ownerAsCapability(res)
+		ls := getAppLabels(c.Name)
+		paramsMap := parametersAsMap(c.Spec.Parameters)
+		secret.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
 			Labels:    ls,
-		},
-		Data: map[string][]byte{
+		}
+		secret.Data = map[string][]byte{
 			KubedbPgUser:         []byte(paramsMap[DbUser]),
 			KubedbPgPassword:     []byte(paramsMap[DbPassword]),
 			KubedbPgDatabaseName: []byte(SetDefaultDatabaseName(paramsMap[DbName])),
@@ -49,18 +59,14 @@ func (res secret) Build() (runtime.Object, error) {
 			DbName:     []byte(SetDefaultDatabaseName(paramsMap[DbName])),
 			DbUser:     []byte((paramsMap[DbUser])),
 			DbPassword: []byte(paramsMap[DbPassword]),
-		},
+		}
 	}
 
 	return secret, nil
 }
 
 func (res secret) Name() string {
-	c := res.ownerAsCapability()
+	c := ownerAsCapability(res)
 	paramsMap := parametersAsMap(c.Spec.Parameters)
 	return SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
-}
-
-func (res secret) ShouldWatch() bool {
-	return false
 }
