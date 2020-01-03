@@ -8,7 +8,6 @@ import (
 	"halkyon.io/operator-framework"
 	plugins "halkyon.io/plugins/capability"
 	v12 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"os"
@@ -18,10 +17,8 @@ import (
 var _ plugins.PluginResource = &PostgresPluginResource{}
 
 var (
-	postgresGVK    = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
-	roleGVK        = v1.SchemeGroupVersion.WithKind("Role")
-	roleBindingGVK = v1.SchemeGroupVersion.WithKind("RoleBinding")
-	secretGVK      = v12.SchemeGroupVersion.WithKind("Secret")
+	postgresGVK = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
+	secretGVK   = v12.SchemeGroupVersion.WithKind("Secret")
 )
 
 type PostgresPluginResource struct {
@@ -31,10 +28,10 @@ type PostgresPluginResource struct {
 
 func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) map[schema.GroupVersionKind]framework.DependentResource {
 	return map[schema.GroupVersionKind]framework.DependentResource{
-		postgresGVK:    newPostgres(owner),
-		roleGVK:        framework.NewOwnedRole(owner, roleNamer),
-		roleBindingGVK: newRoleBinding(owner),
-		secretGVK:      newSecret(owner),
+		postgresGVK:              newPostgres(owner),
+		framework.RoleGVK:        framework.NewOwnedRole(owner, roleNamer),
+		framework.RoleBindingGVK: newRoleBinding(owner),
+		secretGVK:                newSecret(owner),
 	}
 }
 
