@@ -71,7 +71,7 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 			},
 		}
 	}
-	return framework.CreateUnstructuredObject(postgres, postgresGVK)
+	return postgres, nil
 }
 
 func (res postgres) IsReady(underlying runtime.Object) (ready bool, message string) {
