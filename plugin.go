@@ -8,7 +8,6 @@ import (
 	"halkyon.io/operator-framework"
 	plugins "halkyon.io/plugins/capability"
 	v12 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"os"
 	"path/filepath"
@@ -26,12 +25,12 @@ type PostgresPluginResource struct {
 	cc halkyon.CapabilityCategory
 }
 
-func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) map[schema.GroupVersionKind]framework.DependentResource {
-	return map[schema.GroupVersionKind]framework.DependentResource{
-		postgresGVK:              newPostgres(owner),
-		framework.RoleGVK:        framework.NewOwnedRole(owner, roleNamer),
-		framework.RoleBindingGVK: newRoleBinding(owner),
-		secretGVK:                newSecret(owner),
+func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
+	return []framework.DependentResource{
+		framework.NewOwnedRole(owner, roleNamer),
+		newRoleBinding(owner),
+		newSecret(owner),
+		newPostgres(owner),
 	}
 }
 

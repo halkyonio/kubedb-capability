@@ -6,8 +6,8 @@ require (
 	github.com/appscode/go v0.0.0-20191025021232-311ac347b3ef
 	github.com/hashicorp/go-plugin v1.0.2-0.20191004171845-809113480b55
 	halkyon.io/api v1.0.0-beta.8.0.20191219201020-14dfa325eab8
-	halkyon.io/operator-framework v0.0.0-20200103152240-53e4a468c340
-	halkyon.io/plugins v0.0.0-20200103174752-dbfb988cb7c5
+	halkyon.io/operator-framework v0.0.0-20200104203407-2e8124af6b8e
+	halkyon.io/plugins v0.0.0-20200104213012-f9f8c6d3e2ca
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 	kmodules.xyz/offshoot-api v0.0.0-20190901210649-de049192326c
