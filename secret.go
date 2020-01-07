@@ -16,8 +16,8 @@ func (res secret) NameFrom(underlying runtime.Object) string {
 	return framework.DefaultNameFrom(res, underlying)
 }
 
-func (res secret) Fetch(helper *framework.K8SHelper) (runtime.Object, error) {
-	return framework.DefaultFetcher(res, helper)
+func (res secret) Fetch() (runtime.Object, error) {
+	return framework.DefaultFetcher(res)
 }
 
 func (res secret) IsReady(underlying runtime.Object) (ready bool, message string) {
@@ -31,7 +31,7 @@ func (res secret) Update(toUpdate runtime.Object) (bool, error) {
 }
 
 func newSecret(owner v1beta1.HalkyonResource) secret {
-	config := framework.NewConfig(secretGVK, owner.GetNamespace())
+	config := framework.NewConfig(secretGVK)
 	config.Watched = false
 	return secret{framework.NewConfiguredBaseDependentResource(owner, config)}
 }
