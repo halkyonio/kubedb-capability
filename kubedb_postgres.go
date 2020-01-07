@@ -17,8 +17,8 @@ type postgres struct {
 	*framework.BaseDependentResource
 }
 
-func (res postgres) Fetch(helper *framework.K8SHelper) (runtime.Object, error) {
-	return helper.Fetch(res.Name(), res.Owner().GetNamespace(), &kubedbv1.Postgres{})
+func (res postgres) Fetch() (runtime.Object, error) {
+	panic("should never be called")
 }
 
 var _ framework.DependentResource = &postgres{}
@@ -28,7 +28,7 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
 }
 
 func newPostgres(owner v1beta1.HalkyonResource) *postgres {
-	config := framework.NewConfig(postgresGVK, owner.GetNamespace())
+	config := framework.NewConfig(postgresGVK)
 	config.CheckedForReadiness = true
 	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
 	p := &postgres{framework.NewConfiguredBaseDependentResource(owner, config)}
