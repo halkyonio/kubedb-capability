@@ -15,6 +15,7 @@ require (
 )
 
 replace (
+	github.com/go-check/check => github.com/go-check/check v0.0.0-20180628173108-788fd7840127
 	gomodules.xyz/cert => gomodules.xyz/cert v1.0.1
 	gomodules.xyz/jsonpatch/v2 => gomodules.xyz/jsonpatch/v2 v2.0.1
 	k8s.io/api => k8s.io/api v0.0.0-20190805182251-6c9aa3caf3d6 // kubernetes-1.14.5
