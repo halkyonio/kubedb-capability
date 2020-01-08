@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	v1beta12 "halkyon.io/api/capability/v1beta1"

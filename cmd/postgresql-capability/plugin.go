@@ -7,18 +7,13 @@ import (
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/operator-framework"
 	plugins "halkyon.io/plugins/capability"
-	v12 "k8s.io/api/core/v1"
+	pgsql "halkyon.io/postgresql-capability/pkg/plugin"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"os"
 	"path/filepath"
 )
 
 var _ plugins.PluginResource = &PostgresPluginResource{}
-
-var (
-	postgresGVK = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
-	secretGVK   = v12.SchemeGroupVersion.WithKind("Secret")
-)
 
 type PostgresPluginResource struct {
 	ct halkyon.CapabilityType
@@ -27,15 +22,11 @@ type PostgresPluginResource struct {
 
 func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
 	return []framework.DependentResource{
-		framework.NewOwnedRole(owner, roleNamer),
-		newRoleBinding(owner),
-		newSecret(owner),
-		newPostgres(owner),
+		framework.NewOwnedRole(owner, pgsql.RoleName),
+		pgsql.NewRoleBinding(owner),
+		pgsql.NewSecret(owner),
+		pgsql.NewPostgres(owner),
 	}
-}
-
-func roleNamer() string {
-	return "scc-privileged-role"
 }
 
 func (p *PostgresPluginResource) GetSupportedCategory() halkyon.CapabilityCategory {

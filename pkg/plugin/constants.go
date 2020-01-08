@@ -1,4 +1,9 @@
-package main
+package plugin
+
+import (
+	core "k8s.io/api/core/v1"
+	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+)
 
 const (
 	Secret = "Secret"
@@ -13,4 +18,9 @@ const (
 	DbName       = "DB_NAME"
 	DbUser       = "DB_USER"
 	DbPassword   = "DB_PASSWORD"
+)
+
+var (
+	postgresGVK = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
+	secretGVK   = core.SchemeGroupVersion.WithKind(Secret)
 )

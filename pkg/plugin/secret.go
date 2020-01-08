@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"halkyon.io/api/v1beta1"
@@ -30,7 +30,7 @@ func (res secret) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func newSecret(owner v1beta1.HalkyonResource) secret {
+func NewSecret(owner v1beta1.HalkyonResource) secret {
 	config := framework.NewConfig(secretGVK)
 	config.Watched = false
 	return secret{framework.NewConfiguredBaseDependentResource(owner, config)}

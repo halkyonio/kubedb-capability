@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"halkyon.io/api/v1beta1"
@@ -11,11 +11,11 @@ type roleBinding struct {
 	framework.RoleBinding
 }
 
-func newRoleBinding(owner v1beta1.HalkyonResource) roleBinding {
+func NewRoleBinding(owner v1beta1.HalkyonResource) roleBinding {
 	generic := framework.NewOwnedRoleBinding(owner,
 		func() string { return "use-scc-privileged" },
-		func() string { return roleNamer() },
-		func() string { return newPostgres(owner).Name() })
+		func() string { return RoleName() },
+		func() string { return NewPostgres(owner).Name() })
 	rb := roleBinding{RoleBinding: generic}
 	return rb
 }

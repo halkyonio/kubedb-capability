@@ -1,4 +1,4 @@
-package main
+package plugin
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func newPostgres(owner v1beta1.HalkyonResource) *postgres {
+func NewPostgres(owner v1beta1.HalkyonResource) *postgres {
 	config := framework.NewConfig(postgresGVK)
 	config.CheckedForReadiness = true
 	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
