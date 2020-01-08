@@ -15,6 +15,7 @@ require (
 )
 
 replace (
+	github.com/census-instrumentation/opencensus-proto => github.com/census-instrumentation/opencensus-proto v0.2.1
 	github.com/go-check/check => github.com/go-check/check v0.0.0-20180628173108-788fd7840127
 	gomodules.xyz/cert => gomodules.xyz/cert v1.0.1
 	gomodules.xyz/jsonpatch/v2 => gomodules.xyz/jsonpatch/v2 v2.0.1
