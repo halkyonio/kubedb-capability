@@ -16,8 +16,7 @@ builds:
   goarch:
     - amd64
 archives:
-- replacements:
-    amd64: x86_64
+- name_template: "halkyon_plugin"
 checksum:
   name_template: 'checksums.txt'
 snapshot:
