@@ -13,10 +13,12 @@ builds:
     - '-w'
   goos:
     - linux
+    - darwin
+    - windows
   goarch:
     - amd64
 archives:
-- name_template: "halkyon_plugin"
+- name_template: "halkyon_plugin_{{ .Os }}"
 checksum:
   name_template: 'checksums.txt'
 snapshot:
