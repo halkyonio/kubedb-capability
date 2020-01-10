@@ -5,6 +5,7 @@ import (
 	"github.com/appscode/go/encoding/json/types"
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
+	"halkyon.io/postgresql-capability/pkg/plugin"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,9 +44,9 @@ func (res postgres) Name() string {
 func (res postgres) Build(empty bool) (runtime.Object, error) {
 	postgres := &kubedbv1.Postgres{}
 	if !empty {
-		c := ownerAsCapability(res)
-		ls := getAppLabels(c.Name)
-		paramsMap := parametersAsMap(c.Spec.Parameters)
+		c := plugin.OwnerAsCapability(res)
+		ls := plugin.GetAppLabels(c.Name)
+		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		postgres.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
@@ -53,19 +54,19 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 		}
 		postgres.Spec = kubedbv1.PostgresSpec{
 			Version:  SetDefaultDatabaseVersionIfEmpty(c.Spec.Version),
-			Replicas: replicaNumber(1),
+			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},
 			DatabaseSecret: &core.SecretVolumeSource{
-				SecretName: SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName]),
+				SecretName: plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName]),
 			},
 			StorageType:       kubedbv1.StorageTypeEphemeral,
 			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
 			PodTemplate: ofst.PodTemplateSpec{
 				Spec: ofst.PodSpec{
 					Env: []core.EnvVar{
-						{Name: KubedbPgDatabaseName, Value: SetDefaultDatabaseName(paramsMap[DbName])},
+						{Name: KubedbPgDatabaseName, Value: plugin.SetDefaultDatabaseName(paramsMap[DbName])},
 					},
 				},
 			},
@@ -90,11 +91,6 @@ func (res postgres) IsReady(underlying runtime.Object) (ready bool, message stri
 
 func (res postgres) NameFrom(underlying runtime.Object) string {
 	return underlying.(*kubedbv1.Postgres).Name
-}
-
-func replicaNumber(num int) *int32 {
-	q := int32(num)
-	return &q
 }
 
 func SetDefaultDatabaseVersionIfEmpty(version string) types.StrYo {
