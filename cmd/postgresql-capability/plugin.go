@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"github.com/hashicorp/go-plugin"
 	plugins "halkyon.io/plugins/capability"
+	"halkyon.io/postgresql-capability/pkg/plugin/mysql"
 	"halkyon.io/postgresql-capability/pkg/plugin/postgresql"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"os"
@@ -14,7 +15,7 @@ func main() {
 	gob.Register(kubedbv1.Postgres{})
 	gob.Register(kubedbv1.PostgresList{})
 	pluginName := filepath.Base(os.Args[0])
-	p, err := plugins.NewAggregatePluginResource(postgresql.NewPluginResource())
+	p, err := plugins.NewAggregatePluginResource(postgresql.NewPluginResource(), mysql.NewPluginResource())
 	if err != nil {
 		panic(err)
 	}
