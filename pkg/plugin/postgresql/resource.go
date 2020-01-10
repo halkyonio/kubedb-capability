@@ -5,12 +5,13 @@ import (
 	v1beta12 "halkyon.io/api/v1beta1"
 	"halkyon.io/operator-framework"
 	"halkyon.io/plugins/capability"
+	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
 var _ capability.PluginResource = &PostgresPluginResource{}
 
 func NewPluginResource() capability.PluginResource {
-	return &PostgresPluginResource{capability.NewSimplePluginResourceStem(v1beta1.DatabaseCategory, v1beta1.PostgresType)}
+	return &PostgresPluginResource{capability.NewSimplePluginResourceStem(v1beta1.DatabaseCategory, kubedbv1.ResourceKindPostgres)}
 }
 
 type PostgresPluginResource struct {
