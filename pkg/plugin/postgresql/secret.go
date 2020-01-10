@@ -3,6 +3,7 @@ package postgresql
 import (
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
+	"halkyon.io/postgresql-capability/pkg/plugin"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -40,9 +41,9 @@ func NewSecret(owner v1beta1.HalkyonResource) secret {
 func (res secret) Build(empty bool) (runtime.Object, error) {
 	secret := &v1.Secret{}
 	if !empty {
-		c := ownerAsCapability(res)
-		ls := getAppLabels(c.Name)
-		paramsMap := parametersAsMap(c.Spec.Parameters)
+		c := plugin.OwnerAsCapability(res)
+		ls := plugin.GetAppLabels(c.Name)
+		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		secret.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
@@ -51,12 +52,12 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 		secret.Data = map[string][]byte{
 			KubedbPgUser:         []byte(paramsMap[DbUser]),
 			KubedbPgPassword:     []byte(paramsMap[DbPassword]),
-			KubedbPgDatabaseName: []byte(SetDefaultDatabaseName(paramsMap[DbName])),
+			KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[DbName])),
 			// TODO : To be reviewed according to the discussion started with issue #75
 			// as we will create another secret when a link will be issued
-			DbHost:     []byte(SetDefaultDatabaseHost(c.Name, paramsMap[DbHost])),
-			DbPort:     []byte(SetDefaultDatabasePort(paramsMap[DbPort])),
-			DbName:     []byte(SetDefaultDatabaseName(paramsMap[DbName])),
+			DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[DbHost])),
+			DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[DbPort])),
+			DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[DbName])),
 			DbUser:     []byte((paramsMap[DbUser])),
 			DbPassword: []byte(paramsMap[DbPassword]),
 		}
@@ -66,7 +67,7 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 }
 
 func (res secret) Name() string {
-	c := ownerAsCapability(res)
-	paramsMap := parametersAsMap(c.Spec.Parameters)
-	return SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
+	c := plugin.OwnerAsCapability(res)
+	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
 }
