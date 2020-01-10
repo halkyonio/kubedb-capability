@@ -1,4 +1,4 @@
-package plugin
+package postgresql
 
 import (
 	v1beta12 "halkyon.io/api/capability/v1beta1"
