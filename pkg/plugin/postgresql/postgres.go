@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/appscode/go/encoding/json/types"
 	"halkyon.io/api/v1beta1"
+	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
-	"halkyon.io/postgresql-capability/pkg/plugin"
 	apps "k8s.io/api/apps/v1"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ func (res postgres) Fetch() (runtime.Object, error) {
 
 var _ framework.DependentResource = &postgres{}
 
-func (res postgres) Update(toUpdate runtime.Object) (bool, error) {
+func (res postgres) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 

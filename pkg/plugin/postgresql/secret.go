@@ -2,8 +2,8 @@ package postgresql
 
 import (
 	"halkyon.io/api/v1beta1"
+	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
-	"halkyon.io/postgresql-capability/pkg/plugin"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,7 +27,7 @@ func (res secret) IsReady(underlying runtime.Object) (ready bool, message string
 
 var _ framework.DependentResource = &secret{}
 
-func (res secret) Update(toUpdate runtime.Object) (bool, error) {
+func (res secret) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 

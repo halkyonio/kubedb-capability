@@ -1,4 +1,4 @@
-module halkyon.io/postgresql-capability
+module halkyon.io/kubedb-capability
 
 go 1.13
 

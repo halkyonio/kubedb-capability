@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/gob"
 	"github.com/hashicorp/go-plugin"
+	"halkyon.io/kubedb-capability/pkg/plugin/mysql"
+	"halkyon.io/kubedb-capability/pkg/plugin/postgresql"
 	plugins "halkyon.io/plugins/capability"
-	"halkyon.io/postgresql-capability/pkg/plugin/mysql"
-	"halkyon.io/postgresql-capability/pkg/plugin/postgresql"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"os"
 	"path/filepath"

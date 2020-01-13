@@ -3,8 +3,8 @@ package mysql
 import (
 	"fmt"
 	"halkyon.io/api/v1beta1"
+	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
-	"halkyon.io/postgresql-capability/pkg/plugin"
 	apps "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,7 +30,7 @@ func (m *mysql) Name() string {
 	return framework.DefaultDependentResourceNameFor(m.Owner())
 }
 
-func (m *mysql) NameFrom(underlying runtime.Object) string {
+func (m *mysql) NameFrom(_ runtime.Object) string {
 	return framework.DefaultDependentResourceNameFor(m.Owner())
 }
 
@@ -61,7 +61,7 @@ func (m *mysql) Build(empty bool) (runtime.Object, error) {
 	return mysql, nil
 }
 
-func (m *mysql) Update(toUpdate runtime.Object) (bool, error) {
+func (m *mysql) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 
