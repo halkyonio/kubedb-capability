@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/go-plugin v1.0.2-0.20191004171845-809113480b55
 	halkyon.io/api v1.0.0-rc.1
 	halkyon.io/operator-framework v1.0.0-beta.2
-	halkyon.io/plugins v0.0.0-20200110175835-d5311720d445
+	halkyon.io/plugins v1.0.0-beta.3
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 	kmodules.xyz/offshoot-api v0.0.0-20190901210649-de049192326c
