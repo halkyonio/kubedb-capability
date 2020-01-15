@@ -16,7 +16,7 @@ type MongoDBPluginResource struct {
 }
 
 func (m MongoDBPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResource) []framework.DependentResource {
-	return []framework.DependentResource{NewMon(owner)}
+	return []framework.DependentResource{NewMongoDB(owner)}
 }
 
 func NewPluginResource() capability.PluginResource {
