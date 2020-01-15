@@ -3,6 +3,7 @@ package mysql
 import (
 	"halkyon.io/api/capability/v1beta1"
 	beta1 "halkyon.io/api/v1beta1"
+	"halkyon.io/kubedb-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
 	"halkyon.io/plugins/capability"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
@@ -19,5 +20,17 @@ func (m MySQLPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResour
 }
 
 func NewPluginResource() capability.PluginResource {
-	return &MySQLPluginResource{capability.NewSimplePluginResourceStem(v1beta1.DatabaseCategory, kubedbv1.ResourceKindMySQL)}
+	list, err := plugin.Client.MySQLVersions().List(plugin.NotDeprecated)
+	if err != nil {
+		panic(err)
+	}
+	versions := make([]string, 0, len(list.Items))
+	for _, version := range list.Items {
+		versions = append(versions, version.Spec.Version)
+	}
+	info := capability.TypeInfo{
+		Type:     kubedbv1.ResourceKindMySQL,
+		Versions: versions,
+	}
+	return &MySQLPluginResource{capability.NewSimplePluginResourceStem(v1beta1.DatabaseCategory, info)}
 }

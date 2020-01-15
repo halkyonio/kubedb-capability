@@ -5,13 +5,14 @@ go 1.13
 require (
 	github.com/appscode/go v0.0.0-20191025021232-311ac347b3ef
 	github.com/hashicorp/go-plugin v1.0.2-0.20191004171845-809113480b55
-	halkyon.io/api v1.0.0-rc.1
+	halkyon.io/api v1.0.0-rc.1.0.20200114204915-a39cb95c417b
 	halkyon.io/operator-framework v1.0.0-beta.2
-	halkyon.io/plugins v1.0.0-beta.3
+	halkyon.io/plugins v1.0.0-beta.3.0.20200114212700-7e085244eb15
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 	kmodules.xyz/offshoot-api v0.0.0-20190901210649-de049192326c
 	kubedb.dev/apimachinery v0.13.0-rc.2
+	sigs.k8s.io/controller-runtime v0.3.0
 )
 
 replace (
