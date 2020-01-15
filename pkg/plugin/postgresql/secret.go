@@ -9,6 +9,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+var secretGVK = v1.SchemeGroupVersion.WithKind("Secret")
+
 type secret struct {
 	*framework.BaseDependentResource
 }
@@ -50,16 +52,16 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		secret.Data = map[string][]byte{
-			KubedbPgUser:         []byte(paramsMap[DbUser]),
-			KubedbPgPassword:     []byte(paramsMap[DbPassword]),
-			KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[DbName])),
+			KubedbPgUser:         []byte(paramsMap[plugin.DbUser]),
+			KubedbPgPassword:     []byte(paramsMap[plugin.DbPassword]),
+			KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
 			// TODO : To be reviewed according to the discussion started with issue #75
 			// as we will create another secret when a link will be issued
-			DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[DbHost])),
-			DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[DbPort])),
-			DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[DbName])),
-			DbUser:     []byte((paramsMap[DbUser])),
-			DbPassword: []byte(paramsMap[DbPassword]),
+			plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
+			plugin.DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[plugin.DbPort])),
+			plugin.DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+			plugin.DbUser:     []byte((paramsMap[plugin.DbUser])),
+			plugin.DbPassword: []byte(paramsMap[plugin.DbPassword]),
 		}
 	}
 
@@ -69,5 +71,5 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 func (res secret) Name() string {
 	c := plugin.OwnerAsCapability(res)
 	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
+	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[plugin.DbConfigName])
 }

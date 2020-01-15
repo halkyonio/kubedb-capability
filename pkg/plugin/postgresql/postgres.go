@@ -2,15 +2,12 @@ package postgresql
 
 import (
 	"fmt"
-	"github.com/appscode/go/encoding/json/types"
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
 	apps "k8s.io/api/apps/v1"
-	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	ofst "kmodules.xyz/offshoot-api/api/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
@@ -58,19 +55,17 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
 			},
-			DatabaseSecret: &core.SecretVolumeSource{
-				SecretName: plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName]),
-			},
 			StorageType:       kubedbv1.StorageTypeEphemeral,
 			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
-			PodTemplate: ofst.PodTemplateSpec{
-				Spec: ofst.PodSpec{
-					Env: []core.EnvVar{
-						{Name: KubedbPgDatabaseName, Value: plugin.SetDefaultDatabaseName(paramsMap[DbName])},
-					},
-				},
-			},
 		}
+
+		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
+			postgres.Spec.DatabaseSecret = secret
+		}
+		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(KubedbPgDatabaseName, paramsMap); dbNameConfig != nil {
+			postgres.Spec.PodTemplate = *dbNameConfig
+		}
+
 	}
 	return postgres, nil
 }
@@ -91,20 +86,4 @@ func (res postgres) IsReady(underlying runtime.Object) (ready bool, message stri
 
 func (res postgres) NameFrom(underlying runtime.Object) string {
 	return underlying.(*kubedbv1.Postgres).Name
-}
-
-func SetDefaultDatabaseVersionIfEmpty(version string) types.StrYo {
-	// Map DB Version with the KubeDB Version
-	switch version {
-	case "9":
-		return "9.6-v4"
-	case "10":
-		return "10.6-v2"
-	case "10.6-v2":
-		return "10.6"
-	case "11":
-		return "11.2"
-	default:
-		return "10.6-v2"
-	}
 }

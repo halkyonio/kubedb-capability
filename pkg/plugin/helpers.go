@@ -1,9 +1,12 @@
 package plugin
 
 import (
+	"github.com/appscode/go/encoding/json/types"
 	v1beta12 "halkyon.io/api/capability/v1beta1"
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
+	v1 "k8s.io/api/core/v1"
+	v12 "kmodules.xyz/offshoot-api/api/v1"
 	"strings"
 )
 
@@ -18,6 +21,30 @@ func ParametersAsMap(parameters []v1beta1.NameValuePair) map[string]string {
 		result[parameter.Name] = parameter.Value
 	}
 	return result
+}
+
+func GetVersionFrom(capability *v1beta12.Capability) types.StrYo {
+	return types.StrYo(capability.Spec.Version)
+}
+
+func GetSecretOrNil(parameters map[string]string) *v1.SecretVolumeSource {
+	if secretName, ok := parameters[DbConfigName]; ok {
+		return &v1.SecretVolumeSource{SecretName: secretName}
+	}
+	return nil
+}
+
+func GetDatabaseNameConfigOrNil(envVarName string, parameters map[string]string) *v12.PodTemplateSpec {
+	if dbName, ok := parameters[DbName]; ok {
+		return &v12.PodTemplateSpec{
+			Spec: v12.PodSpec{
+				Env: []v1.EnvVar{
+					{Name: envVarName, Value: dbName},
+				},
+			},
+		}
+	}
+	return nil
 }
 
 func SetDefaultSecretNameIfEmpty(capabilityName, paramSecretName string) string {
