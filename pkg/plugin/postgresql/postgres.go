@@ -43,7 +43,6 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
 		ls := plugin.GetAppLabels(c.Name)
-		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		postgres.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
@@ -59,13 +58,13 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
 		}
 
+		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
 			postgres.Spec.DatabaseSecret = secret
 		}
 		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(KubedbPgDatabaseName, paramsMap); dbNameConfig != nil {
 			postgres.Spec.PodTemplate = *dbNameConfig
 		}
-
 	}
 	return postgres, nil
 }
