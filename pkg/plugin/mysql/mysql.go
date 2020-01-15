@@ -57,6 +57,15 @@ func (m *mysql) Build(empty bool) (runtime.Object, error) {
 			StorageType:       kubedbv1.StorageTypeEphemeral,
 			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
 		}
+
+		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
+			mysql.Spec.DatabaseSecret = secret
+		}
+		// see https://kubedb.com/docs/v0.13.0-rc.0/concepts/databases/mysql/#spec-podtemplate-spec-env for db name var name
+		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil("MYSQL_DATABASE", paramsMap); dbNameConfig != nil {
+			mysql.Spec.PodTemplate = *dbNameConfig
+		}
 	}
 	return mysql, nil
 }
