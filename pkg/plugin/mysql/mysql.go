@@ -49,7 +49,7 @@ func (m *mysql) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		mysql.Spec = kubedbv1.MySQLSpec{
-			Version:  "8.0-v2",
+			Version:  plugin.GetVersionFrom(c),
 			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,

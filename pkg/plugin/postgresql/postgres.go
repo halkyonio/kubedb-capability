@@ -50,7 +50,7 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		postgres.Spec = kubedbv1.PostgresSpec{
-			Version:  SetDefaultDatabaseVersionIfEmpty(c.Spec.Version),
+			Version:  plugin.GetVersionFrom(c),
 			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,
