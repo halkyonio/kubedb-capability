@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"github.com/appscode/go/strings"
 	"halkyon.io/api/capability/v1beta1"
 	v1beta12 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
@@ -19,7 +20,7 @@ func NewPluginResource() capability.PluginResource {
 	}
 	versions := make([]string, 0, len(list.Items))
 	for _, version := range list.Items {
-		if !version.Spec.Deprecated {
+		if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
 			versions = append(versions, version.Spec.Version)
 		}
 	}
