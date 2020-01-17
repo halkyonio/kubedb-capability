@@ -23,13 +23,13 @@ func (m MongoDBPluginResource) GetDependentResourcesWith(owner beta1.HalkyonReso
 
 func NewPluginResource() capability.PluginResource {
 	list, err := plugin.Client.MongoDBVersions().List(v1.ListOptions{})
-	if err != nil {
-		panic(err)
-	}
-	versions := make([]string, 0, len(list.Items))
-	for _, version := range list.Items {
-		if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
-			versions = append(versions, version.Spec.Version)
+	versions := []string{}
+	if err == nil {
+		versions = make([]string, 0, len(list.Items))
+		for _, version := range list.Items {
+			if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
+				versions = append(versions, version.Spec.Version)
+			}
 		}
 	}
 	info := capability.TypeInfo{
