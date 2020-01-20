@@ -1,8 +1,7 @@
-package postgresql
+package plugin
 
 import (
 	"halkyon.io/api/v1beta1"
-	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,8 +49,8 @@ func NewSecret(owner NeedsSecret) secret {
 func (res secret) Build(empty bool) (runtime.Object, error) {
 	secret := &v1.Secret{}
 	if !empty {
-		c := plugin.OwnerAsCapability(res)
-		ls := plugin.GetAppLabels(c.Name)
+		c := OwnerAsCapability(res)
+		ls := GetAppLabels(c.Name)
 		secret.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
