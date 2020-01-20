@@ -10,6 +10,13 @@ import (
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
+const (
+	// see https://kubedb.com/docs/v0.13.0-rc.0/concepts/databases/mongodb/#spec-podtemplate-spec-env for db name var name
+	dbNameVarName     = "MONGO_INITDB_DATABASE"
+	dbUserVarName     = "MONGO_INITDB_ROOT_USERNAME"
+	dbPasswordVarName = "MONGO_INITDB_ROOT_PASSWORD"
+)
+
 var _ framework.DependentResource = &mongodb{}
 var gvk = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindMongoDB)
 
@@ -61,7 +68,6 @@ func (m *mongodb) Build(empty bool) (runtime.Object, error) {
 		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
 			mongo.Spec.DatabaseSecret = secret
 		}
-		// see https://kubedb.com/docs/v0.13.0-rc.0/concepts/databases/mongodb/#spec-podtemplate-spec-env
 		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil("MONGO_INITDB_DATABASE", paramsMap); dbNameConfig != nil {
 			mongo.Spec.PodTemplate = dbNameConfig
 		}
@@ -75,4 +81,41 @@ func (m *mongodb) Update(toUpdate runtime.Object) (bool, error) {
 
 func (m *mongodb) IsReady(underlying runtime.Object) (ready bool, message string) {
 	panic("implement me")
+}
+
+func (m *mongodb) GetRoleBindingName() string {
+	return "use-scc-privileged"
+}
+
+func (m *mongodb) GetAssociatedRoleName() string {
+	return m.GetRoleName()
+}
+
+func (m *mongodb) GetServiceAccountName() string {
+	return m.Name()
+}
+
+func (m *mongodb) GetRoleName() string {
+	return "scc-privileged-role"
+}
+
+func (m *mongodb) GetDataMap() map[string][]byte {
+	c := plugin.OwnerAsCapability(m)
+	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	return map[string][]byte{
+		dbUserVarName:     []byte(paramsMap[plugin.DbUser]),
+		dbPasswordVarName: []byte(paramsMap[plugin.DbPassword]),
+		dbNameVarName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+		// TODO : To be reviewed according to the discussion started with issue #75
+		// as we will create another secret when a link will be issued
+		plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
+		plugin.DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[plugin.DbPort])),
+		plugin.DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+		plugin.DbUser:     []byte((paramsMap[plugin.DbUser])),
+		plugin.DbPassword: []byte(paramsMap[plugin.DbPassword]),
+	}
+}
+
+func (m *mongodb) GetSecretName() string {
+	return plugin.DefaultSecretNameFor(m)
 }

@@ -47,6 +47,12 @@ func GetDatabaseNameConfigOrNil(envVarName string, parameters map[string]string)
 	return nil
 }
 
+func DefaultSecretNameFor(secretOwner NeedsSecret) string {
+	c := secretOwner.Owner().(*v1beta12.Capability)
+	paramsMap := ParametersAsMap(c.Spec.Parameters)
+	return SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
+}
+
 func SetDefaultSecretNameIfEmpty(capabilityName, paramSecretName string) string {
 	if paramSecretName == "" {
 		return strings.ToLower(capabilityName) + "-config"
