@@ -812,6 +812,10 @@ halkyon.io/api v1.0.0-rc.1.0.20200116120548-0fb179a1356f h1:KKMsRVgfWb3FzWGdgMb1
 halkyon.io/api v1.0.0-rc.1.0.20200116120548-0fb179a1356f/go.mod h1:bCOZh54+rJ4SQad0L0OMO0B+Jf7J3OtKp7SPmdLowGE=
 halkyon.io/operator-framework v1.0.0-beta.2 h1:snG0Y2IIbX1JgYYkcWMhdmWCGeXvb9T4kb13z9EoN9o=
 halkyon.io/operator-framework v1.0.0-beta.2/go.mod h1:vB4euwqnSltCyaAXhiqLCcwyFJ40479HZsohtDW4bLc=
+halkyon.io/operator-framework v1.0.0-beta.2.0.20200120144233-b6e1abbb00b6 h1:xbA9Bl7OAA71uJf5nGJYgjDwn9v+iVUdbBqRcxh0Jbo=
+halkyon.io/operator-framework v1.0.0-beta.2.0.20200120144233-b6e1abbb00b6/go.mod h1:vB4euwqnSltCyaAXhiqLCcwyFJ40479HZsohtDW4bLc=
+halkyon.io/operator-framework v1.0.0-beta.2.0.20200120152715-8bcf7b959f27 h1:pDR9K76KdEKE5ED80cwrKO9UbkZqENc7ST01VKl5rA8=
+halkyon.io/operator-framework v1.0.0-beta.2.0.20200120152715-8bcf7b959f27/go.mod h1:vB4euwqnSltCyaAXhiqLCcwyFJ40479HZsohtDW4bLc=
 halkyon.io/plugins v1.0.0-beta.3.0.20200116121258-8bdb76ac3ddd h1:eWVzdD+RABo2kAcLuIdNkHnDIdgLKFkfnUIeeMNLPgc=
 halkyon.io/plugins v1.0.0-beta.3.0.20200116121258-8bdb76ac3ddd/go.mod h1:5pZUV0ADysCfnGWhnYAjh0y/xsz7GUxZ4/CCqDMxh3U=
 honnef.co/go/tools v0.0.0-20180728063816-88497007e858/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
