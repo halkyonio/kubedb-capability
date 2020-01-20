@@ -11,8 +11,15 @@ import (
 
 var secretGVK = v1.SchemeGroupVersion.WithKind("Secret")
 
+type NeedsSecret interface {
+	GetDataMap() map[string][]byte
+	GetSecretName() string
+	Owner() v1beta1.HalkyonResource
+}
+
 type secret struct {
 	*framework.BaseDependentResource
+	Delegate NeedsSecret
 }
 
 func (res secret) NameFrom(underlying runtime.Object) string {
@@ -33,10 +40,10 @@ func (res secret) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func NewSecret(owner v1beta1.HalkyonResource) secret {
+func NewSecret(owner NeedsSecret) secret {
 	config := framework.NewConfig(secretGVK)
 	config.Watched = false
-	return secret{framework.NewConfiguredBaseDependentResource(owner, config)}
+	return secret{BaseDependentResource: framework.NewConfiguredBaseDependentResource(owner.Owner(), config), Delegate: owner}
 }
 
 //buildSecret returns the secret resource
@@ -45,31 +52,17 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
 		ls := plugin.GetAppLabels(c.Name)
-		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		secret.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
 			Labels:    ls,
 		}
-		secret.Data = map[string][]byte{
-			KubedbPgUser:         []byte(paramsMap[plugin.DbUser]),
-			KubedbPgPassword:     []byte(paramsMap[plugin.DbPassword]),
-			KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
-			// TODO : To be reviewed according to the discussion started with issue #75
-			// as we will create another secret when a link will be issued
-			plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
-			plugin.DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[plugin.DbPort])),
-			plugin.DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
-			plugin.DbUser:     []byte((paramsMap[plugin.DbUser])),
-			plugin.DbPassword: []byte(paramsMap[plugin.DbPassword]),
-		}
+		secret.Data = res.Delegate.GetDataMap()
 	}
 
 	return secret, nil
 }
 
 func (res secret) Name() string {
-	c := plugin.OwnerAsCapability(res)
-	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[plugin.DbConfigName])
+	return res.Delegate.GetSecretName()
 }
