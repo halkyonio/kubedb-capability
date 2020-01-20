@@ -34,7 +34,7 @@ func NewPostgres(owner v1beta1.HalkyonResource) *postgres {
 }
 
 func (res postgres) Name() string {
-	return PostgresName(res.Owner())
+	return framework.DefaultDependentResourceNameFor(res.Owner())
 }
 
 //buildSecret returns the postgres resource
@@ -85,4 +85,20 @@ func (res postgres) IsReady(underlying runtime.Object) (ready bool, message stri
 
 func (res postgres) NameFrom(underlying runtime.Object) string {
 	return underlying.(*kubedbv1.Postgres).Name
+}
+
+func (res postgres) GetRoleBindingName() string {
+	return "use-scc-privileged"
+}
+
+func (res postgres) GetAssociatedRoleName() string {
+	return res.GetRoleName()
+}
+
+func (res postgres) GetServiceAccountName() string {
+	return res.Name()
+}
+
+func (res postgres) GetRoleName() string {
+	return "scc-privileged-role"
 }

@@ -36,10 +36,11 @@ type PostgresPluginResource struct {
 }
 
 func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta12.HalkyonResource) []framework.DependentResource {
+	postgres := NewPostgres(owner)
 	return []framework.DependentResource{
-		framework.NewOwnedRole(owner, RoleName),
-		NewRoleBinding(owner),
+		framework.NewOwnedRole(postgres),
+		plugin.NewRoleBinding(postgres),
 		NewSecret(owner),
-		NewPostgres(owner),
+		postgres,
 	}
 }
