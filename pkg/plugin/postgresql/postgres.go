@@ -11,6 +11,17 @@ import (
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
 
+const (
+	// KubeDB Postgres const
+	dbNameVarName     = "POSTGRES_DB"
+	dbUserVarName     = "POSTGRES_USER"
+	dbPasswordVarName = "POSTGRES_PASSWORD"
+)
+
+var (
+	postgresGVK = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
+)
+
 type postgres struct {
 	*framework.BaseDependentResource
 }
@@ -62,7 +73,7 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
 			postgres.Spec.DatabaseSecret = secret
 		}
-		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(KubedbPgDatabaseName, paramsMap); dbNameConfig != nil {
+		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(dbNameVarName, paramsMap); dbNameConfig != nil {
 			postgres.Spec.PodTemplate = *dbNameConfig
 		}
 	}
@@ -107,9 +118,9 @@ func (res postgres) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(res)
 	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 	return map[string][]byte{
-		KubedbPgUser:         []byte(paramsMap[plugin.DbUser]),
-		KubedbPgPassword:     []byte(paramsMap[plugin.DbPassword]),
-		KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+		dbUserVarName:     []byte(paramsMap[plugin.DbUser]),
+		dbPasswordVarName: []byte(paramsMap[plugin.DbPassword]),
+		dbNameVarName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
 		// TODO : To be reviewed according to the discussion started with issue #75
 		// as we will create another secret when a link will be issued
 		plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
@@ -121,7 +132,5 @@ func (res postgres) GetDataMap() map[string][]byte {
 }
 
 func (res postgres) GetSecretName() string {
-	c := plugin.OwnerAsCapability(res)
-	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[plugin.DbConfigName])
+	return plugin.DefaultSecretNameFor(res)
 }

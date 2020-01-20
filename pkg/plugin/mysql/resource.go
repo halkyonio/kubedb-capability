@@ -18,7 +18,11 @@ type MySQLPluginResource struct {
 }
 
 func (m MySQLPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResource) []framework.DependentResource {
-	return []framework.DependentResource{NewMySQL(owner)}
+	mySQL := NewMySQL(owner)
+	return []framework.DependentResource{framework.NewOwnedRole(mySQL),
+		plugin.NewRoleBinding(mySQL),
+		plugin.NewSecret(mySQL),
+		mySQL}
 }
 
 func NewPluginResource() capability.PluginResource {
