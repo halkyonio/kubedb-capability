@@ -102,3 +102,26 @@ func (res postgres) GetServiceAccountName() string {
 func (res postgres) GetRoleName() string {
 	return "scc-privileged-role"
 }
+
+func (res postgres) GetDataMap() map[string][]byte {
+	c := plugin.OwnerAsCapability(res)
+	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	return map[string][]byte{
+		KubedbPgUser:         []byte(paramsMap[plugin.DbUser]),
+		KubedbPgPassword:     []byte(paramsMap[plugin.DbPassword]),
+		KubedbPgDatabaseName: []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+		// TODO : To be reviewed according to the discussion started with issue #75
+		// as we will create another secret when a link will be issued
+		plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
+		plugin.DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[plugin.DbPort])),
+		plugin.DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
+		plugin.DbUser:     []byte((paramsMap[plugin.DbUser])),
+		plugin.DbPassword: []byte(paramsMap[plugin.DbPassword]),
+	}
+}
+
+func (res postgres) GetSecretName() string {
+	c := plugin.OwnerAsCapability(res)
+	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	return plugin.SetDefaultSecretNameIfEmpty(c.Name, paramsMap[plugin.DbConfigName])
+}
