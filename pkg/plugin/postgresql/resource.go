@@ -40,7 +40,7 @@ func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta12.Halkyo
 	return []framework.DependentResource{
 		framework.NewOwnedRole(postgres),
 		plugin.NewRoleBinding(postgres),
-		NewSecret(postgres),
+		plugin.NewSecret(postgres),
 		postgres,
 	}
 }
