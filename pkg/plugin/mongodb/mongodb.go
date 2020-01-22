@@ -65,7 +65,7 @@ func (m *mongodb) Build(empty bool) (runtime.Object, error) {
 		}
 
 		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
+		if secret := plugin.GetSecretOrDefault(m, paramsMap); secret != nil {
 			mongo.Spec.DatabaseSecret = secret
 		}
 		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil("MONGO_INITDB_DATABASE", paramsMap); dbNameConfig != nil {

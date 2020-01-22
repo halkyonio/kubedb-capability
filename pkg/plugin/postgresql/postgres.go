@@ -70,7 +70,7 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 		}
 
 		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-		if secret := plugin.GetSecretOrNil(paramsMap); secret != nil {
+		if secret := plugin.GetSecretOrDefault(res, paramsMap); secret != nil {
 			postgres.Spec.DatabaseSecret = secret
 		}
 		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(dbNameVarName, paramsMap); dbNameConfig != nil {

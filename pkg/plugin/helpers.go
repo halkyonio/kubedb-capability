@@ -27,11 +27,13 @@ func GetVersionFrom(capability *v1beta12.Capability) types.StrYo {
 	return types.StrYo(capability.Spec.Version)
 }
 
-func GetSecretOrNil(parameters map[string]string) *v1.SecretVolumeSource {
+func GetSecretOrDefault(needsSecret NeedsSecret, parameters map[string]string) *v1.SecretVolumeSource {
 	if secretName, ok := parameters[DbConfigName]; ok {
 		return &v1.SecretVolumeSource{SecretName: secretName}
+	} else {
+		// generate default secret name
+		return &v1.SecretVolumeSource{SecretName: needsSecret.GetSecretName()}
 	}
-	return nil
 }
 
 func GetDatabaseNameConfigOrNil(envVarName string, parameters map[string]string) *v12.PodTemplateSpec {
