@@ -6,7 +6,7 @@ import (
 	beta1 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
-	"halkyon.io/plugins/capability"
+	"halkyon.io/operator-framework/plugins/capability"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 )
