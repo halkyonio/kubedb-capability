@@ -9,12 +9,17 @@ import (
 	"halkyon.io/operator-framework/plugins/capability"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"log"
 )
 
 var _ capability.PluginResource = &PostgresPluginResource{}
 
 func NewPluginResource() capability.PluginResource {
+	log.Println("Starting Postgres support")
 	list, err := plugin.Client.PostgresVersions().List(v1.ListOptions{})
+	if err != nil {
+		log.Printf("error retrieving versions: %v", err)
+	}
 	versions := []string{}
 	if err == nil {
 		versions = make([]string, 0, len(list.Items))
