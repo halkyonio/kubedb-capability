@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/appscode/go/strings"
+	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
 	beta1 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
@@ -14,7 +15,7 @@ import (
 var _ capability.PluginResource = &MySQLPluginResource{}
 
 type MySQLPluginResource struct {
-	capability.SimplePluginResourceStem
+	capability.QueryingSimplePluginResourceStem
 }
 
 func (m MySQLPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResource) []framework.DependentResource {
@@ -26,19 +27,23 @@ func (m MySQLPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResour
 }
 
 func NewPluginResource() capability.PluginResource {
+	return &MySQLPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.DatabaseCategory, resolver)}
+}
+
+func resolver(logger hclog.Logger) capability.TypeInfo {
 	list, err := plugin.Client.MySQLVersions().List(v1.ListOptions{})
-	versions := []string{}
-	if err == nil {
-		versions = make([]string, 0, len(list.Items))
-		for _, version := range list.Items {
-			if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
-				versions = append(versions, version.Spec.Version)
-			}
+	if err != nil {
+		logger.Error("error retrieving versions: %v", err)
+	}
+	versions := make([]string, 0, len(list.Items))
+	for _, version := range list.Items {
+		if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
+			versions = append(versions, version.Spec.Version)
 		}
 	}
 	info := capability.TypeInfo{
 		Type:     kubedbv1.ResourceKindMySQL,
 		Versions: versions,
 	}
-	return &MySQLPluginResource{capability.NewSimplePluginResourceStem(v1beta1.DatabaseCategory, info)}
+	return info
 }
