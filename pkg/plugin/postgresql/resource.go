@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"fmt"
 	"github.com/appscode/go/strings"
 	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
@@ -21,7 +22,7 @@ func NewPluginResource() capability.PluginResource {
 func resolver(logger hclog.Logger) capability.TypeInfo {
 	list, err := plugin.Client.PostgresVersions().List(v1.ListOptions{})
 	if err != nil {
-		logger.Error("error retrieving versions: %v", err)
+		logger.Error(fmt.Sprintf("error retrieving versions: %v", err))
 	}
 	versions := make([]string, 0, len(list.Items))
 	for _, version := range list.Items {
