@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"fmt"
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
@@ -80,7 +81,17 @@ func (m *mongodb) Update(toUpdate runtime.Object) (bool, error) {
 }
 
 func (m *mongodb) IsReady(underlying runtime.Object) (ready bool, message string) {
-	panic("implement me")
+	mongo := underlying.(*kubedbv1.MongoDB)
+	ready = mongo.Status.Phase == kubedbv1.DatabasePhaseRunning
+	if !ready {
+		msg := ""
+		reason := mongo.Status.Reason
+		if len(reason) > 0 {
+			msg = ": " + reason
+		}
+		message = fmt.Sprintf("%s is not ready%s", mongo.Name, msg)
+	}
+	return
 }
 
 func (m *mongodb) GetRoleBindingName() string {
