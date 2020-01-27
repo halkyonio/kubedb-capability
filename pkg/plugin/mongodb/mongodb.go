@@ -56,7 +56,7 @@ func (m *mongodb) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		mongo.Spec = kubedbv1.MongoDBSpec{
-			Version:  plugin.GetVersionFrom(c),
+			Version:  plugin.GetVersionFrom(c, versionsMapping),
 			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,

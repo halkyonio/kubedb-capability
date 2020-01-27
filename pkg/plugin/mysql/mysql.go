@@ -56,7 +56,7 @@ func (m *mysql) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		mysql.Spec = kubedbv1.MySQLSpec{
-			Version:  plugin.GetVersionFrom(c),
+			Version:  plugin.GetVersionFrom(c, versionsMapping),
 			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,

@@ -60,7 +60,7 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 			Labels:    ls,
 		}
 		postgres.Spec = kubedbv1.PostgresSpec{
-			Version:  plugin.GetVersionFrom(c),
+			Version:  plugin.GetVersionFrom(c, versionsMapping),
 			Replicas: plugin.ReplicaNumber(1),
 			UpdateStrategy: apps.StatefulSetUpdateStrategy{
 				Type: apps.RollingUpdateStatefulSetStrategyType,

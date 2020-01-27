@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"fmt"
-	"github.com/appscode/go/strings"
 	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
 	v1beta12 "halkyon.io/api/v1beta1"
@@ -11,9 +10,11 @@ import (
 	"halkyon.io/operator-framework/plugins/capability"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
+	"strings"
 )
 
 var _ capability.PluginResource = &PostgresPluginResource{}
+var versionsMapping = make(map[string]string, 11)
 
 func NewPluginResource() capability.PluginResource {
 	return &PostgresPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.DatabaseCategory, resolver)}
@@ -26,8 +27,17 @@ func resolver(logger hclog.Logger) capability.TypeInfo {
 	}
 	versions := make([]string, 0, len(list.Items))
 	for _, version := range list.Items {
-		if !version.Spec.Deprecated && !strings.Contains(versions, version.Spec.Version) {
-			versions = append(versions, version.Spec.Version)
+		if !version.Spec.Deprecated {
+			external := version.Spec.Version
+			internal, ok := versionsMapping[external]
+			if !ok {
+				versions = append(versions, external)
+				versionsMapping[external] = version.Name
+			} else {
+				if strings.Compare(internal, version.Name) < 0 {
+					versionsMapping[external] = version.Name
+				}
+			}
 		}
 	}
 	info := capability.TypeInfo{

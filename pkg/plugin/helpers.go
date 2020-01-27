@@ -23,8 +23,12 @@ func ParametersAsMap(parameters []v1beta1.NameValuePair) map[string]string {
 	return result
 }
 
-func GetVersionFrom(capability *v1beta12.Capability) types.StrYo {
-	return types.StrYo(capability.Spec.Version)
+func GetVersionFrom(capability *v1beta12.Capability, versionsMapping map[string]string) types.StrYo {
+	version, ok := versionsMapping[capability.Spec.Version]
+	if !ok {
+		version = "Unknown or deprecated version: " + capability.Spec.Version
+	}
+	return types.StrYo(version)
 }
 
 func GetSecretOrDefault(needsSecret NeedsSecret, parameters map[string]string) *v1.SecretVolumeSource {
