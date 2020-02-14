@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"fmt"
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
@@ -49,7 +48,7 @@ func (res postgres) Name() string {
 }
 
 //buildSecret returns the postgres resource
-func (res postgres) Build(empty bool) (runtime.Object, error) {
+func (res *postgres) Build(empty bool) (runtime.Object, error) {
 	postgres := &kubedbv1.Postgres{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
@@ -80,18 +79,21 @@ func (res postgres) Build(empty bool) (runtime.Object, error) {
 	return postgres, nil
 }
 
-func (res postgres) IsReady(underlying runtime.Object) (ready bool, message string) {
-	psql := underlying.(*kubedbv1.Postgres)
-	ready = psql.Status.Phase == kubedbv1.DatabasePhaseRunning
-	if !ready {
-		msg := ""
-		reason := psql.Status.Reason
-		if len(reason) > 0 {
-			msg = ": " + reason
-		}
-		message = fmt.Sprintf("%s is not ready%s", psql.Name, msg)
-	}
-	return
+func (res *postgres) GetDatabasePhase(underlying runtime.Object) kubedbv1.DatabasePhase {
+	return statusOf(underlying).Phase
+}
+
+func statusOf(underlying runtime.Object) kubedbv1.PostgresStatus {
+	return underlying.(*kubedbv1.Postgres).Status
+}
+
+func (res *postgres) GetReason(underlying runtime.Object) string {
+	return statusOf(underlying).Reason
+}
+
+func (res *postgres) GetCondition(underlying runtime.Object, err error) *v1beta1.DependentCondition {
+	condition := plugin.GetCondition(res, err, underlying)
+	return condition
 }
 
 func (res postgres) NameFrom(underlying runtime.Object) string {
@@ -114,7 +116,7 @@ func (res postgres) GetRoleName() string {
 	return "scc-privileged-role"
 }
 
-func (res postgres) GetDataMap() map[string][]byte {
+func (res *postgres) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(res)
 	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 	return map[string][]byte{
@@ -131,6 +133,6 @@ func (res postgres) GetDataMap() map[string][]byte {
 	}
 }
 
-func (res postgres) GetSecretName() string {
+func (res *postgres) GetSecretName() string {
 	return plugin.DefaultSecretNameFor(res)
 }

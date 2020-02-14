@@ -1,14 +1,41 @@
 package plugin
 
 import (
+	"fmt"
 	"github.com/appscode/go/encoding/json/types"
 	v1beta12 "halkyon.io/api/capability/v1beta1"
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	v12 "kmodules.xyz/offshoot-api/api/v1"
+	kubedbv1 "kubedb.dev/apimachinery/apis/kubedb/v1alpha1"
 	"strings"
 )
+
+type KubeDBStatusAware interface {
+	framework.DependentResource
+	GetDatabasePhase(underlying runtime.Object) kubedbv1.DatabasePhase
+	GetReason(underlying runtime.Object) string
+}
+
+func GetCondition(dep KubeDBStatusAware, err error, underlying runtime.Object) *v1beta1.DependentCondition {
+	return framework.DefaultCustomizedGetConditionFor(dep, err, underlying, func(underlying runtime.Object, cond *v1beta1.DependentCondition) {
+		ready := dep.GetDatabasePhase(underlying) == kubedbv1.DatabasePhaseRunning
+		if !ready {
+			msg := ""
+			reason := dep.GetReason(underlying)
+			if len(reason) > 0 {
+				msg = ": " + reason
+			}
+			cond.Type = v1beta1.DependentPending
+			cond.Message = fmt.Sprintf("%s is not ready%s", dep.Name(), msg)
+		} else {
+			cond.Type = v1beta1.DependentReady
+			cond.Message = fmt.Sprintf("%s is ready", dep.Name())
+		}
+	})
+}
 
 func OwnerAsCapability(res framework.DependentResource) *v1beta12.Capability {
 	return res.Owner().(*v1beta12.Capability)

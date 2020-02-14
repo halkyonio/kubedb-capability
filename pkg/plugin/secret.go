@@ -9,6 +9,7 @@ import (
 )
 
 var secretGVK = v1.SchemeGroupVersion.WithKind("Secret")
+var _ framework.DependentResource = &secret{}
 
 type NeedsSecret interface {
 	GetDataMap() map[string][]byte
@@ -29,11 +30,9 @@ func (res secret) Fetch() (runtime.Object, error) {
 	return framework.DefaultFetcher(res)
 }
 
-func (res secret) IsReady(underlying runtime.Object) (ready bool, message string) {
-	return framework.DefaultIsReady(underlying)
+func (res secret) GetCondition(underlying runtime.Object, err error) *v1beta1.DependentCondition {
+	return framework.DefaultGetConditionFor(res, err)
 }
-
-var _ framework.DependentResource = &secret{}
 
 func (res secret) Update(_ runtime.Object) (bool, error) {
 	return false, nil
