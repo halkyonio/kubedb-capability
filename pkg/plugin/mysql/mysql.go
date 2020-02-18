@@ -75,8 +75,8 @@ func (m *mysql) Build(empty bool) (runtime.Object, error) {
 	return mysql, nil
 }
 
-func (m *mysql) Update(_ runtime.Object) (bool, error) {
-	return false, nil
+func (m *mysql) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
+	return false, toUpdate, nil
 }
 
 func (m *mysql) GetDatabasePhase(underlying runtime.Object) kubedbv1.DatabasePhase {

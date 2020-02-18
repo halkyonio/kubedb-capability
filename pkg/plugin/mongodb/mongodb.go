@@ -75,8 +75,8 @@ func (m *mongodb) Build(empty bool) (runtime.Object, error) {
 	return mongo, nil
 }
 
-func (m *mongodb) Update(toUpdate runtime.Object) (bool, error) {
-	return false, nil
+func (m *mongodb) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
+	return false, toUpdate, nil
 }
 
 func (m *mongodb) GetDatabasePhase(underlying runtime.Object) kubedbv1.DatabasePhase {
