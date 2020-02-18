@@ -31,8 +31,8 @@ func (res postgres) Fetch() (runtime.Object, error) {
 
 var _ framework.DependentResource = &postgres{}
 
-func (res postgres) Update(_ runtime.Object) (bool, error) {
-	return false, nil
+func (res postgres) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
+	return false, toUpdate, nil
 }
 
 func NewPostgres(owner v1beta1.HalkyonResource) *postgres {

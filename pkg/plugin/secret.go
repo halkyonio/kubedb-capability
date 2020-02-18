@@ -34,8 +34,8 @@ func (res secret) GetCondition(underlying runtime.Object, err error) *v1beta1.De
 	return framework.DefaultGetConditionFor(res, err)
 }
 
-func (res secret) Update(_ runtime.Object) (bool, error) {
-	return false, nil
+func (res secret) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
+	return false, toUpdate, nil
 }
 
 func NewSecret(owner NeedsSecret) secret {
