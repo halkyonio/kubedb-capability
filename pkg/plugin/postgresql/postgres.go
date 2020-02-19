@@ -36,7 +36,7 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, runtime.Object, error
 	return false, toUpdate, nil
 }
 
-func NewPostgres(owner v1beta1.HalkyonResource) *postgres {
+func NewPostgres(owner framework.SerializableResource) *postgres {
 	config := framework.NewConfig(postgresGVK)
 	config.CheckedForReadiness = true
 	p := &postgres{framework.NewConfiguredBaseDependentResource(owner, config)}

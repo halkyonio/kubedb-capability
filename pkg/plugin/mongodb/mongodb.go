@@ -25,7 +25,7 @@ type mongodb struct {
 	*framework.BaseDependentResource
 }
 
-func NewMongoDB(owner v1beta1.HalkyonResource) *mongodb {
+func NewMongoDB(owner framework.SerializableResource) *mongodb {
 	config := framework.NewConfig(gvk)
 	config.CheckedForReadiness = true
 	p := &mongodb{framework.NewConfiguredBaseDependentResource(owner, config)}
