@@ -27,7 +27,6 @@ type mongodb struct {
 func NewMongoDB(owner v1beta1.HalkyonResource) *mongodb {
 	config := framework.NewConfig(gvk)
 	config.CheckedForReadiness = true
-	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
 	p := &mongodb{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }

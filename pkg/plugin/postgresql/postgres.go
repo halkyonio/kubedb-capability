@@ -38,7 +38,6 @@ func (res postgres) Update(toUpdate runtime.Object) (bool, runtime.Object, error
 func NewPostgres(owner v1beta1.HalkyonResource) *postgres {
 	config := framework.NewConfig(postgresGVK)
 	config.CheckedForReadiness = true
-	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
 	p := &postgres{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }
