@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
-	v1beta12 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
@@ -51,7 +50,7 @@ type PostgresPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
-func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta12.HalkyonResource) []framework.DependentResource {
+func (p *PostgresPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	postgres := NewPostgres(owner)
 	return []framework.DependentResource{
 		framework.NewOwnedRole(postgres),

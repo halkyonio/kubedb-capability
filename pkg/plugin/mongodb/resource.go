@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
-	beta1 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
@@ -20,7 +19,7 @@ type MongoDBPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
-func (m MongoDBPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResource) []framework.DependentResource {
+func (m MongoDBPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	mongoDB := NewMongoDB(owner)
 	return []framework.DependentResource{framework.NewOwnedRole(mongoDB),
 		plugin.NewRoleBinding(mongoDB),

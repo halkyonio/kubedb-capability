@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-hclog"
 	"halkyon.io/api/capability/v1beta1"
-	beta1 "halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
@@ -20,7 +19,7 @@ type MySQLPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
-func (m MySQLPluginResource) GetDependentResourcesWith(owner beta1.HalkyonResource) []framework.DependentResource {
+func (m MySQLPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	mySQL := NewMySQL(owner)
 	return []framework.DependentResource{framework.NewOwnedRole(mySQL),
 		plugin.NewRoleBinding(mySQL),

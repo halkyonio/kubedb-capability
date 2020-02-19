@@ -25,7 +25,7 @@ type mysql struct {
 	*framework.BaseDependentResource
 }
 
-func NewMySQL(owner v1beta1.HalkyonResource) *mysql {
+func NewMySQL(owner framework.SerializableResource) *mysql {
 	config := framework.NewConfig(mysqlGVK)
 	config.CheckedForReadiness = true
 	p := &mysql{framework.NewConfiguredBaseDependentResource(owner, config)}
