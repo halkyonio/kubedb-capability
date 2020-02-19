@@ -4,6 +4,7 @@ import (
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/kubedb-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
+	"halkyon.io/operator-framework/util"
 	apps "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -63,7 +64,7 @@ func (m *mongodb) Build(empty bool) (runtime.Object, error) {
 			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
 		}
 
-		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+		paramsMap := util.ParametersAsMap(c.Spec.Parameters)
 		if secret := plugin.GetSecretOrDefault(m, paramsMap); secret != nil {
 			mongo.Spec.DatabaseSecret = secret
 		}
@@ -112,7 +113,7 @@ func (m *mongodb) GetRoleName() string {
 
 func (m *mongodb) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(m)
-	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	paramsMap := util.ParametersAsMap(c.Spec.Parameters)
 	return map[string][]byte{
 		dbUserVarName:     []byte(paramsMap[plugin.DbUser]),
 		dbPasswordVarName: []byte(paramsMap[plugin.DbPassword]),

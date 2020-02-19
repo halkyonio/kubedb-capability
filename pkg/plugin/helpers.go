@@ -6,6 +6,7 @@ import (
 	v1beta12 "halkyon.io/api/capability/v1beta1"
 	"halkyon.io/api/v1beta1"
 	framework "halkyon.io/operator-framework"
+	"halkyon.io/operator-framework/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	v12 "kmodules.xyz/offshoot-api/api/v1"
@@ -41,15 +42,6 @@ func OwnerAsCapability(res framework.DependentResource) *v1beta12.Capability {
 	return res.Owner().(*v1beta12.Capability)
 }
 
-// Convert Array of parameters to a Map
-func ParametersAsMap(parameters []v1beta1.NameValuePair) map[string]string {
-	result := make(map[string]string)
-	for _, parameter := range parameters {
-		result[parameter.Name] = parameter.Value
-	}
-	return result
-}
-
 func GetVersionFrom(capability *v1beta12.Capability, versionsMapping map[string]string) types.StrYo {
 	version, ok := versionsMapping[capability.Spec.Version]
 	if !ok {
@@ -58,7 +50,7 @@ func GetVersionFrom(capability *v1beta12.Capability, versionsMapping map[string]
 	return types.StrYo(version)
 }
 
-func GetSecretOrDefault(needsSecret NeedsSecret, parameters map[string]string) *v1.SecretVolumeSource {
+func GetSecretOrDefault(needsSecret framework.NeedsSecret, parameters map[string]string) *v1.SecretVolumeSource {
 	if secretName, ok := parameters[DbConfigName]; ok {
 		return &v1.SecretVolumeSource{SecretName: secretName}
 	} else {
@@ -80,9 +72,9 @@ func GetDatabaseNameConfigOrNil(envVarName string, parameters map[string]string)
 	return nil
 }
 
-func DefaultSecretNameFor(secretOwner NeedsSecret) string {
+func DefaultSecretNameFor(secretOwner framework.NeedsSecret) string {
 	c := secretOwner.Owner().(*v1beta12.Capability)
-	paramsMap := ParametersAsMap(c.Spec.Parameters)
+	paramsMap := util.ParametersAsMap(c.Spec.Parameters)
 	return SetDefaultSecretNameIfEmpty(c.Name, paramsMap[DbConfigName])
 }
 
