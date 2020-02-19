@@ -27,7 +27,6 @@ type mysql struct {
 func NewMySQL(owner v1beta1.HalkyonResource) *mysql {
 	config := framework.NewConfig(mysqlGVK)
 	config.CheckedForReadiness = true
-	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
 	p := &mysql{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }

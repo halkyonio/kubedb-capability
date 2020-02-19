@@ -6,7 +6,7 @@ require (
 	github.com/appscode/go v0.0.0-20191119085241-0887d8ec2ecc
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd
 	halkyon.io/api v1.0.0-rc.4.0.20200217221003-af8973318c2d
-	halkyon.io/operator-framework v1.0.0-beta.4.0.20200217221133-2d1fdc28e06c
+	halkyon.io/operator-framework v1.0.0-beta.4.0.20200219111755-1e5b655e240f
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 	kmodules.xyz/offshoot-api v0.0.0-20190901210649-de049192326c
