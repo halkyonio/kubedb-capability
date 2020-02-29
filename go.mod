@@ -16,6 +16,7 @@ require (
 
 replace (
 	github.com/census-instrumentation/opencensus-proto => github.com/census-instrumentation/opencensus-proto v0.2.1
+	github.com/go-check/check => github.com/go-check/check v0.0.0-20180628173108-788fd7840127 // needed to avoid goreleaser failure
 	gomodules.xyz/cert => gomodules.xyz/cert v1.0.1 // needed to avoid error from checksum server
 	gomodules.xyz/jsonpatch/v2 => gomodules.xyz/jsonpatch/v2 v2.0.1
 	k8s.io/api => k8s.io/api v0.0.0-20190805182251-6c9aa3caf3d6 // kubernetes-1.14.5
