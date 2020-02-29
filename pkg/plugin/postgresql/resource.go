@@ -50,6 +50,10 @@ type PostgresPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
+func (p *PostgresPluginResource) CheckValidity(owner framework.SerializableResource) []string {
+	return []string{}
+}
+
 func (p *PostgresPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	postgres := NewPostgres(owner)
 	return []framework.DependentResource{

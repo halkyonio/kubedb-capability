@@ -19,6 +19,10 @@ type MongoDBPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
+func (m MongoDBPluginResource) CheckValidity(owner framework.SerializableResource) []string {
+	return []string{}
+}
+
 func (m MongoDBPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	mongoDB := NewMongoDB(owner)
 	return []framework.DependentResource{framework.NewOwnedRole(mongoDB),

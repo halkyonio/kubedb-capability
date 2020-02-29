@@ -19,6 +19,10 @@ type MySQLPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
+func (m MySQLPluginResource) CheckValidity(owner framework.SerializableResource) []string {
+	return []string{}
+}
+
 func (m MySQLPluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	mySQL := NewMySQL(owner)
 	return []framework.DependentResource{framework.NewOwnedRole(mySQL),

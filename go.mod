@@ -5,8 +5,8 @@ go 1.13
 require (
 	github.com/appscode/go v0.0.0-20191119085241-0887d8ec2ecc
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd
-	halkyon.io/api v1.0.0-rc.5
-	halkyon.io/operator-framework v1.0.0-beta.5
+	halkyon.io/api v1.0.0-rc.5.0.20200225094354-ffc4920a82c2
+	halkyon.io/operator-framework v1.0.0-beta.5.0.20200229174708-bb6b40403b8a
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 	kmodules.xyz/offshoot-api v0.0.0-20190901210649-de049192326c
