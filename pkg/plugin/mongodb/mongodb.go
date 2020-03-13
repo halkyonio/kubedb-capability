@@ -36,10 +36,6 @@ func (m *mongodb) Name() string {
 	return framework.DefaultDependentResourceNameFor(m.Owner())
 }
 
-func (m *mongodb) NameFrom(underlying runtime.Object) string {
-	return framework.DefaultNameFrom(m, underlying)
-}
-
 func (m *mongodb) Fetch() (runtime.Object, error) {
 	panic("should never be called")
 }

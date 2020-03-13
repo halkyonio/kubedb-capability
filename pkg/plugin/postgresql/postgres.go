@@ -96,10 +96,6 @@ func (res *postgres) GetCondition(underlying runtime.Object, err error) *v1beta1
 	return condition
 }
 
-func (res postgres) NameFrom(underlying runtime.Object) string {
-	return underlying.(*kubedbv1.Postgres).Name
-}
-
 func (res postgres) GetRoleBindingName() string {
 	return "use-scc-privileged"
 }

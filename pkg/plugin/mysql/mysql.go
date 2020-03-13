@@ -36,10 +36,6 @@ func (m *mysql) Name() string {
 	return framework.DefaultDependentResourceNameFor(m.Owner())
 }
 
-func (m *mysql) NameFrom(underlying runtime.Object) string {
-	return framework.DefaultNameFrom(m, underlying)
-}
-
 func (m *mysql) Fetch() (runtime.Object, error) {
 	panic("should never be called")
 }
